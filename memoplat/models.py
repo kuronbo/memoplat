@@ -19,9 +19,9 @@ class Memo:
 
     def __repr__(self):
         cls = type(self)
-        return '{cls.__name__}(id_={self.id!r}, category_id={self.category_id!r},' \
+        return '<{cls.__name__}(id_={self.id!r}, category_id={self.category_id!r},' \
                ' title={self.title!r}, caption={self.caption!r}, ' \
-               'created_at={self.created_at!r})'.format(cls=cls, self=self)
+               'created_at={self.created_at!r})>'.format(cls=cls, self=self)
 
 
 class Category:
@@ -37,7 +37,7 @@ class Category:
 
     def __repr__(self):
         cls = type(self)
-        return '{cls.__name__}(id_={self.id!r}, name={self.name!r})'\
+        return '<{cls.__name__}(id_={self.id!r}, name={self.name!r})>'\
             .format(cls=cls, self=self)
 
 
@@ -54,5 +54,5 @@ class Tag:
 
     def __repr__(self):
         cls = type(self)
-        return '{cls.__name__}(id_={self.id!r}, name={self.name!r})' \
+        return '<{cls.__name__}(id_={self.id!r}, name={self.name!r})>' \
             .format(cls=cls, self=self)
