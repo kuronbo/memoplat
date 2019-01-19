@@ -10,22 +10,22 @@ class Memo:
         category_id (str): カテゴリ(:class:`Category`)のid
         title (str): タイトル
         caption (str): 簡単な説明文
-        tag_ids (list(str)): タグ(:class:`Tag`)のidリスト
+        tagnames (list(str)): タグの名前のリスト
         created_at (datetime.datetime): 作成された日時
     """
-    def __init__(self, id, category_id, title, caption, tag_ids, created_at):
+    def __init__(self, id, category_id, title, caption, tagnames, created_at):
         self.id = id
         self.category_id = category_id
         self.title = title
         self.caption = caption
-        self.tag_ids = list(tag_ids) if tag_ids else []
+        self.tagnames = list(tagnames) if tagnames else []
         self.created_at = created_at
 
     @classmethod
-    def new_instance(cls, category_id, title, caption, tag_ids):
+    def new_instance(cls, category_id, title, caption, tagnames):
         id = str(uuid4())[:8]
         created_at = datetime.now()
-        return cls(id, category_id, title, caption, tag_ids, created_at)
+        return cls(id, category_id, title, caption, tagnames, created_at)
 
     def __repr__(self):
         cls = type(self)
@@ -53,26 +53,4 @@ class Category:
     def __repr__(self):
         cls = type(self)
         return '<{cls.__name__}(id={self.id!r}, name={self.name!r})>'\
-            .format(cls=cls, self=self)
-
-
-class Tag:
-    """タグ
-
-    Attributes:
-        id (str): 固有id
-        name (str): 名前
-    """
-    def __init__(self, id, name):
-        self.id = id
-        self.name = name
-
-    @classmethod
-    def new_instance(cls, name):
-        id = str(uuid4())[:8]
-        return cls(id, name)
-
-    def __repr__(self):
-        cls = type(self)
-        return '<{cls.__name__}(id={self.id!r}, name={self.name!r})>' \
             .format(cls=cls, self=self)

@@ -8,18 +8,16 @@ service.py
 基本的には、crudという種類の関数しかなく、
 結果は`Response`というdictライクなクラスが返される。
 
-また、metplatは3つのレポジトリでドメインの永続化を管理しており、
-このモジュールには、`memo_repo`, `tag_repo`, `category_repo`という3つの
+また、metplatは2つのレポジトリでドメインの永続化を管理しており、
+このモジュールには、`memo_repo`, `category_repo`という2つの
 レポジトリのインスタンスが設定されている。
 """
-from memoplat.domain.models import Memo, Category, Tag
 from memoplat.persistence.impl.impl_sqlalchemy import repository
 
 from memoplat.exceptions import MemoPlatError
 
 
 memo_repo = repository.AlcMemoRepository()
-tag_repo = repository.AlcTagRepository()
 category_repo = repository.AlcCategoryRepository()
 
 
@@ -35,32 +33,35 @@ def wrap_error_decorator(func):
 ##############################################################################
 # command ####################################################################
 ##############################################################################
-#@wrap_error_decorator
 def create_memo(category_name, title, caption, tagnames):
     category = category_repo.get(category_name, by='name')
     if not category:
         raise Exception
-    tags = tag_repo.get_tags(tagnames, by='name')
-    memo = Memo.new_instance(category.id, title, caption,
-                             tag_ids=[tag.id for tag in tags])
-    tag_repo.save_some(tags, memo.id)
+    memo = memo_repo.new(category_id='c1', title=title, caption=caption,
+                         tagnames=tagnames)
     memo_repo.save(memo)
-    tag_repo.commit()
     memo_repo.commit()
 
 
-
-@wrap_error_decorator
 def remove_memo(id):
     memo_repo.remove(id)
     memo_repo.commit()
+
+
+def create_category(name):
+    category = category_repo.new(name=name)
+    category_repo.save(category)
+    category_repo.commit()
 
 
 ##############################################################################
 # query ######################################################################
 ##############################################################################
 
+# memo
 
 
 if __name__ == '__main__':
-    create_memo('aiueo', 'title', 'cap', ['tag1', 'tag2'])
+    create_memo(category_name='簡単読書', title='title', caption='caption', tagnames=['tag1', 'tag2'])
+
+
