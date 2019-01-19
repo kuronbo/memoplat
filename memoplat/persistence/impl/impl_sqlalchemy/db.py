@@ -5,11 +5,12 @@ tables:
     memo: メモ
     category: カテゴリ
     tag: タグ
-    memo_tag_table: メモとタグのidテーブル
 
 relationship:
-    memo-category: many to one
-    memo-tag: many to many (memo_tag_tableを間に噛ませてる)
+    one to many : memo と tag
+    many to one : memo と category
+
+TODO: memoとtagのcascadeを考える。
 """
 from sqlalchemy import create_engine
 from sqlalchemy import Table, Column, String, DateTime, ForeignKey
@@ -17,13 +18,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
 
-engine = create_engine('sqlite:///test.sqlite.db', echo=True)
+engine = create_engine('sqlite:///persistence/impl/impl_sqlalchemy/test.sqlite.db', echo=True)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
-
-memo_tag_table = Table('memo_tag', Base.metadata,
-                       Column('memo_id', String, ForeignKey('memo.id')),
-                       Column('tag_id', String, ForeignKey('tag.id')))
 
 
 class Memo(Base):
@@ -34,9 +31,18 @@ class Memo(Base):
     category = relationship('Category', backref='memos')
     title = Column(String)
     caption = Column(String)
-    tags = relationship('Tag', secondary=memo_tag_table,
-                        back_populates='memos')
+    tags = relationship('Tag')
     created_at = Column(DateTime)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'category_id': self.category.id,
+            'title': self.title,
+            'caption': self.caption,
+            'tags': self.tags,
+            'created_at': self.created_at
+        }
 
 
 class Category(Base):
@@ -45,19 +51,26 @@ class Category(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
+
 
 class Tag(Base):
     __tablename__ = 'tag'
 
     id = Column(String, primary_key=True)
     name = Column(String)
-    memos = relationship('Memo', secondary=memo_tag_table,
-                         back_populates='tags')
+    memo_id = Column(String, ForeignKey('memo.id'))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
 
 
 if __name__ == '__main__':
-    from datetime import datetime
-
-    session = Session()
-
-    print(session.query(Category).all()[0].memos[0].tags)
+    Base.metadata.create_all(bind=engine)
