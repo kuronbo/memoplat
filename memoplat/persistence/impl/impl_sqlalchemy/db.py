@@ -12,15 +12,12 @@ relationship:
 
 TODO: memoとtagのcascadeを考える。
 """
-from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, String, DateTime, ForeignKey
+from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import relationship
 
 
-DB_ENGINE = create_engine('sqlite:///persistence/impl/impl_sqlalchemy/sqlite.db', echo=True)
 Base = declarative_base()
-Session = sessionmaker(bind=DB_ENGINE)
 
 
 class Memo(Base):
@@ -70,8 +67,3 @@ class Tag(Base):
             'id': self.id,
             'name': self.name,
         }
-
-
-if __name__ == '__main__':
-    Base.metadata.drop_all(bind=DB_ENGINE)
-    Base.metadata.create_all(bind=DB_ENGINE)

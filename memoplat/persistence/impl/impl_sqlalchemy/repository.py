@@ -1,7 +1,7 @@
 from memoplat.domain import models
 from memoplat.persistence.interface import MemoRepository, CategoryRepository
 from memoplat.persistence.impl.impl_sqlalchemy import db
-
+from memoplat.persistence.impl.impl_sqlalchemy.config import generate_session
 
 class PersistenceMixin:
     def flush(self):
@@ -16,7 +16,7 @@ class PersistenceMixin:
 
 class AlcMemoRepository(PersistenceMixin, MemoRepository):
     def __init__(self):
-        self.session = db.Session()
+        self.session = generate_session()
 
     def new(self, **kwargs):
         return models.Memo.new_instance(category_id=kwargs['category_id'],
@@ -52,7 +52,7 @@ class AlcMemoRepository(PersistenceMixin, MemoRepository):
 
 class AlcCategoryRepository(PersistenceMixin, CategoryRepository):
     def __init__(self):
-        self.session = db.Session()
+        self.session = generate_session()
 
     def new(self, **kwargs):
         return models.Category.new_instance(name=kwargs['name'])

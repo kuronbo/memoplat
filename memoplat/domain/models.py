@@ -18,7 +18,7 @@ class Memo:
         self.category_id = category_id
         self.title = title
         self.caption = caption
-        self.tagnames = list(tagnames) if tagnames else []
+        self.tagnames = list(set(tagnames)) if tagnames else []
         self.created_at = created_at
 
     @classmethod

@@ -3,6 +3,7 @@ from itertools import groupby
 from sqlalchemy import desc, asc
 
 from memoplat.persistence.impl.impl_sqlalchemy import db
+from memoplat.persistence.impl.impl_sqlalchemy.config import generate_session
 
 
 class Query:
@@ -28,7 +29,7 @@ class MemoQuery(Query):
         return self._generate_responses(filters)
 
     def some_eq_tagname(self, tagname):
-        session = db.Session()
+        session = generate_session()
         memo_ids = [r[0] for r in session.query(db.Tag.memo_id).filter_by(name=tagname).all()]
         filters = [db.Memo.id.in_(memo_ids)]
         return self._generate_responses(filters, session=session)
@@ -55,7 +56,7 @@ class MemoQuery(Query):
         return q.limit(self.limit).offset(self.offset)
 
     def _generate_responses(self, filters, session=None):
-        session = db.Session() if not session else session
+        session = generate_session() if not session else session
         q = self._prepare_query(session)
         q = q.filter(*filters)
         q = self._complete_query(q)
@@ -84,7 +85,7 @@ class TagQuery(Query):
         return self._generate_names(filters)
 
     def _generate_names(self, filters):
-        session = db.Session()
+        session = generate_session()
         q = session.query(db.Tag.name).group_by(db.Tag.name).filter(*filters)
         q = self._complete_query(q)
         return [r[0] for r in q.all()]

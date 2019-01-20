@@ -13,12 +13,8 @@ readの結果は、pythonのプリミティブ型で返される。
 レポジトリのインスタンスが設定されている。
 """
 from memoplat.persistence.impl.impl_sqlalchemy import querys
-from memoplat.persistence.impl.impl_sqlalchemy import repository
 from memoplat.exceptions import MemoPlatError
-
-
-memo_repo = repository.AlcMemoRepository()
-category_repo = repository.AlcCategoryRepository()
+from memoplat import config
 
 
 def wrap_error_decorator(func):
@@ -35,26 +31,26 @@ def wrap_error_decorator(func):
 ##############################################################################
 @wrap_error_decorator
 def create_memo(category_name, title, caption, tagnames):
-    category = category_repo.get(category_name, by='name')
+    category = config.CATEGORY_REPO.get(category_name, by='name')
     if not category:
         raise Exception
-    memo = memo_repo.new(category_id=category_name, title=title, caption=caption,
+    memo = config.MEMO_REPO.new(category_id=category_name, title=title, caption=caption,
                          tagnames=tagnames)
-    memo_repo.save(memo)
-    memo_repo.commit()
+    config.MEMO_REPO.save(memo)
+    config.MEMO_REPO.commit()
 
 
 @wrap_error_decorator
 def delete_memo(id):
-    memo_repo.remove(id)
-    memo_repo.commit()
+    config.MEMO_REPO.remove(id)
+    config.MEMO_REPO.commit()
 
 
 @wrap_error_decorator
 def create_category(name):
-    category = category_repo.new(name=name)
-    category_repo.save(category)
-    category_repo.commit()
+    category = config.CATEGORY_REPO.new(name=name)
+    config.CATEGORY_REPO.save(category)
+    config.CATEGORY_REPO.commit()
 
 
 ##############################################################################
@@ -111,7 +107,3 @@ def read_some_tag_like_name(value, page=0, page_size=10, desc_asc='desc'):
     req = [('name', value)]
     result = query.some_like(req)
     return result
-
-
-if __name__ == '__main__':
-    create_category('name')
