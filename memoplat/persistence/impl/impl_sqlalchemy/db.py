@@ -18,9 +18,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
 
-engine = create_engine('sqlite:///test.sqlite.db', echo=True)
+DB_ENGINE = create_engine('sqlite:///persistence/impl/impl_sqlalchemy/sqlite.db', echo=True)
 Base = declarative_base()
-Session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=DB_ENGINE)
 
 
 class Memo(Base):
@@ -73,9 +73,5 @@ class Tag(Base):
 
 
 if __name__ == '__main__':
-    from datetime import datetime
-
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-    session = Session()
+    Base.metadata.drop_all(bind=DB_ENGINE)
+    Base.metadata.create_all(bind=DB_ENGINE)

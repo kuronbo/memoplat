@@ -6,7 +6,7 @@ from memoplat.persistence.impl.impl_sqlalchemy import db
 
 
 class Query:
-    def __init__(self, offset, limit, order_by, desc_asc):
+    def __init__(self, offset=0, limit=10, order_by='id', desc_asc='desc'):
         self.offset = offset
         self.limit = limit
         self.order_by = order_by
@@ -26,6 +26,12 @@ class MemoQuery(Query):
         for k, v in req:
             filters.append(db.Memo.__dict__[k]==v)
         return self._generate_responses(filters)
+
+    def some_eq_tagname(self, tagname):
+        session = db.Session()
+        memo_ids = [r[0] for r in session.query(db.Tag.memo_id).filter_by(name=tagname).all()]
+        filters = [db.Memo.id.in_(memo_ids)]
+        return self._generate_responses(filters, session=session)
 
     def some_eq_like(self, eq_req, like_req):
         filters = []
@@ -48,8 +54,8 @@ class MemoQuery(Query):
             q = q.order_by(asc(db.Memo.__dict__[self.order_by]))
         return q.limit(self.limit).offset(self.offset)
 
-    def _generate_responses(self, filters):
-        session = db.Session()
+    def _generate_responses(self, filters, session=None):
+        session = db.Session() if not session else session
         q = self._prepare_query(session)
         q = q.filter(*filters)
         q = self._complete_query(q)
@@ -79,9 +85,9 @@ class TagQuery(Query):
 
     def _generate_names(self, filters):
         session = db.Session()
-        q = session.query(db.Tag.name).filter(*filters)
+        q = session.query(db.Tag.name).group_by(db.Tag.name).filter(*filters)
         q = self._complete_query(q)
-        return {r[0] for r in q.all()}
+        return [r[0] for r in q.all()]
 
     def _complete_query(self, q):
         if self.desc_asc == 'desc':
