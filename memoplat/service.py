@@ -31,26 +31,26 @@ def wrap_error_decorator(func):
 ##############################################################################
 @wrap_error_decorator
 def create_memo(category_name, title, caption, tagnames):
-    category = config.CATEGORY_REPO.get(category_name, by='name')
+    category = config.CATEGORY_REPO_MEMOPLAT.get(category_name, by='name')
     if not category:
         raise Exception
-    memo = config.MEMO_REPO.new(category_id=category_name, title=title, caption=caption,
-                         tagnames=tagnames)
-    config.MEMO_REPO.save(memo)
-    config.MEMO_REPO.commit()
+    memo = config.MEMO_REPO_MEMOPLAT.new(category_id=category_name, title=title, caption=caption,
+                                         tagnames=tagnames)
+    config.MEMO_REPO_MEMOPLAT.save(memo)
+    config.MEMO_REPO_MEMOPLAT.commit()
 
 
 @wrap_error_decorator
 def delete_memo(id):
-    config.MEMO_REPO.remove(id)
-    config.MEMO_REPO.commit()
+    config.MEMO_REPO_MEMOPLAT.remove(id)
+    config.MEMO_REPO_MEMOPLAT.commit()
 
 
 @wrap_error_decorator
 def create_category(name):
-    category = config.CATEGORY_REPO.new(name=name)
-    config.CATEGORY_REPO.save(category)
-    config.CATEGORY_REPO.commit()
+    category = config.CATEGORY_REPO_MEMOPLAT.new(name=name)
+    config.CATEGORY_REPO_MEMOPLAT.save(category)
+    config.CATEGORY_REPO_MEMOPLAT.commit()
 
 
 ##############################################################################
