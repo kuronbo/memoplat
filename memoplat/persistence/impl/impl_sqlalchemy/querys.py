@@ -16,6 +16,9 @@ class Query:
 
 class MemoQuery(Query):
     """TODO:like文においてupperとlowerが区別されていない。sqliteの仕様か？"""
+    def some(self):
+        return self._generate_responses({})
+
     def some_like(self, req):
         filters = []
         for k, v in req:
@@ -44,8 +47,7 @@ class MemoQuery(Query):
 
     def _prepare_query(self, session):
         """TODO:outerjoinよりjoinじゃね？"""
-        return session.query(db.Memo, db.Category, db.Tag).\
-            outerjoin(db.Category, db.Memo.category_id==db.Category.id).\
+        return session.query(db.Memo, db.Tag).\
             outerjoin(db.Tag, db.Memo.id==db.Tag.memo_id)
 
     def _complete_query(self, q):
@@ -58,21 +60,20 @@ class MemoQuery(Query):
     def _generate_responses(self, filters, session=None):
         session = generate_session() if not session else session
         q = self._prepare_query(session)
-        q = q.filter(*filters)
+        q = q.filter(*filters) if filters else q
         q = self._complete_query(q)
 
         responses = []
-        group = groupby(q.all(), key=lambda x: (x[0], x[1]))
+        group = groupby(q.all(), key=lambda x: x[0])
         for k, g in group:
-            tagnames = [t.name for _, _, t in g if t]
-            category_name = k[1].name if k[1] else None
-            memo = k[0]
+            tagnames = [t.name for _, t in g if t]
+            memo = k
             response = {'id': memo.id,
-                        'category_name': category_name,
+                        'category_id': memo.category_id,
                         'title': memo.title,
                         'caption': memo.caption,
                         'tagnames': tagnames,
-                        'created_at': memo.created_at.strftime('%Y-%m-%d $H:%M:%S')}
+                        'created_at': memo.created_at.strftime('%Y-%m-%d %H:%M:%S')}
             responses.append(response)
         return responses
 

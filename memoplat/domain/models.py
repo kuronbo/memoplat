@@ -22,8 +22,7 @@ class Memo:
         self.created_at = created_at
 
     @classmethod
-    def new_instance(cls, category_id, title, caption, tagnames):
-        id = str(uuid4())[:8]
+    def new_instance(cls, id, category_id, title, caption, tagnames):
         created_at = datetime.now()
         return cls(id, category_id, title, caption, tagnames, created_at)
 

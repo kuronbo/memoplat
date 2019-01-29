@@ -17,4 +17,4 @@ def create_table():
 
 def set_db_engine(sqlite_path):
     global DB_ENGINE_MEMOPLAT
-    DB_ENGINE_MEMOPLAT = create_engine('sqlite:///{}'.format(sqlite_path))
+    DB_ENGINE_MEMOPLAT = create_engine('sqlite:///{}?check_same_thread=False'.format(sqlite_path))
